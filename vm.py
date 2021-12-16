@@ -1,4 +1,5 @@
 from collections import deque
+from io import open_code
 
 class Machine:
     def __init__(self, fname) -> None:
@@ -141,8 +142,45 @@ class Machine:
         while self.exec_op() != False:
             pass
 
+    def disassemble_arg(self, adr) -> str:
+        if self.memory[adr] < 32768:
+            return str(self.memory[adr])
+        else:
+            return "R" + str(self.memory[adr] - 32768)
+
+    def disassemble_args(self, pc, nargs):
+        return " ".join((self.disassemble_arg(adr) for adr in range(pc+1, pc+nargs+1)))
+
+    instrs = ["hlt", "set", "push", "pop", "eq", "gt",
+                "jmp", "jt", "jf", "add", "mult", "mod",
+                "and", "or", "not", "rmem", "wmem", "call",
+                "ret", "out", "in", "nop"]
+    nargs = [0, 2, 1, 1, 3, 3, 1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 1, 0, 1, 1, 0]
+
+    def disassemble(self, fname):
+        pc = 0
+        with open(fname, "w") as f:
+            while pc < len(self.memory):
+                opcode = self.memory[pc]
+                if opcode >= len(self.instrs):
+                    print(f"{pc} invalid instruction", file=f)
+                    pc += 1
+                    continue
+                instr = f"{pc} {self.instrs[opcode]} {self.disassemble_args(pc, self.nargs[opcode])}"
+                print(instr, file=f)
+                pc += self.nargs[opcode] + 1
+    
+    def memdump(self, fname):
+        with open(fname, "w") as f:
+            for i, val in enumerate(self.memory):
+                print(f"{i} {val}", file=f)
+
 if __name__ == "__main__":
     m = Machine("challenge.bin")
+
+    m.disassemble("disasm.txt")
+
+    m.memdump("dump.txt")
 
     m.exec()
 
