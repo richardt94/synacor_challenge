@@ -3,13 +3,17 @@ from functools import lru_cache
 
 @lru_cache(None)
 def modified_ackermann(a,b,c):
-    if a == 0:
-        return (b+1)%32768
-    if b == 0:
-        return modified_ackermann(a-1,c,c)
-    
-    return modified_ackermann(a-1, modified_ackermann(a,b-1,c),c)
 
+    while a > 0:
+        if b == 0:
+            b = c
+        else:
+            b = modified_ackermann(a,b-1,c)
+        a -= 1
+    
+    return (b+1)%32768
+    
+@lru_cache(None)
 def ackermann(m,n):
     if m == 0:
         return n+1
@@ -20,4 +24,4 @@ def ackermann(m,n):
 
 if __name__ == "__main__":
     sys.setrecursionlimit(30000)
-    print(ackermann(4,1))
+    print(modified_ackermann(4,1,1))
