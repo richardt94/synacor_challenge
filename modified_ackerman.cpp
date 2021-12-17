@@ -3,13 +3,12 @@
 #include <utility>
 #include <iostream>
 
+typedef std::pair<uint16_t,uint16_t> u16pair;
+typedef std::map<u16pair,uint16_t> u16memo;
 
-typedef std::pair<uint32_t,uint32_t> u32pair;
-typedef std::map<u32pair,uint32_t> u32memo;
-
-uint32_t mod_ack(uint32_t a, uint32_t b, uint32_t c, u32memo &memo)
+uint16_t mod_ack(uint16_t a, uint16_t b, uint16_t c, u16memo &memo)
 {
-    u32pair argp = std::make_pair(a, b);
+    u16pair argp = std::make_pair(a, b);
     if (memo.find(argp) != memo.end()) return memo[argp];
 
     while (a > 0)
@@ -18,18 +17,18 @@ uint32_t mod_ack(uint32_t a, uint32_t b, uint32_t c, u32memo &memo)
         else b = mod_ack(a, b-1, c, memo);
         a -= 1;
     }
-    uint32_t retval = (b+1) % 32768;
+    uint16_t retval = (b+1) % 32768;
     memo.insert(std::make_pair(argp,retval));
     return retval;
 }
 
 int main()
 {
-    u32memo m;
-    for (int i = 15850; i < 32768; i++)
+    u16memo m;
+    for (int i = 0; i < 32768; i++)
     {
         m.clear();
-        uint32_t res = mod_ack(4,1,i,m);
+        uint16_t res = mod_ack(4,1,i,m);
         std::cout << i << " " << res << std::endl;
     }
     return 0;
