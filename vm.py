@@ -1,5 +1,4 @@
 from collections import deque
-from io import open_code
 
 class Machine:
     def __init__(self, fname) -> None:
